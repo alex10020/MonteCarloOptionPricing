@@ -1,7 +1,60 @@
 # MonteCarloOptionPricing
-Monte Carlo Simulation for Portfolio Risk & Option PricingOverviewThis project explores the application of Monte Carlo simulation to value financial derivatives and assess portfolio risk1. By simulating thousands of risk-neutral price paths, this tool approximates quantities that are difficult to compute analytically, such as expected payoffs and risk metrics2222.The repository contains a Python implementation that simulates stock portfolio performance to calculate Value at Risk (VaR) and extends the framework to price European Call Options using Risk-Neutral Valuation3.FeaturesData Ingestion: Downloads historical stock data (e.g., AAPL, TSLA, NVDA) using yfinance4.Portfolio Simulation: Uses Cholesky decomposition to maintain historical correlations between assets during simulation5.Risk Analysis: Calculates Value at Risk (VaR) and Conditional Value at Risk (CVaR) to quantify potential downside risk6.Option Pricing: Implements a Risk-Neutral valuation framework to price European Call Options7.Theoretical FrameworkMonte Carlo in FinanceMonte Carlo methods rely on repeated random sampling to solve probabilistic problems. In finance, this involves simulating risk-neutral price paths to estimate statistical properties like expected values and variances8888.Risk-Neutral ValuationFor option pricing, the simulation operates under the Risk-Neutral Measure.Drift: The historical mean return is replaced by the Risk-Free Rate9.Payoff: The expected payoff is discounted back to the present value using the risk-free rate10.Stochastic Process: The model implicitly assumes Geometric Brownian Motion (GBM) for asset price evolution11.DependenciesTo run this project, you will need the following Python libraries12:numpypandasyfinancescipymatplotlibBashpip install numpy pandas yfinance scipy matplotlib
-Usage1. Portfolio Simulation & Risk MetricsThe project first models a portfolio based on historical covariance. It generates correlated random shocks ($Z$) using the Cholesky decomposition ($L$) of the covariance matrix13.Python# Example Logic
-L = np.linalg.cholesky(covMatrix)
-dailyReturns = meanM + np.inner(L, Z)
-portfolio_sims = np.cumprod(np.inner(weights, dailyReturns.T) + 1) * initialPortfolio
-Key Outputs:VaR (5%): The maximum expected loss with 95% confidence over the given timeframe14.CVaR (5%): The expected loss given that the loss is greater than the VaR threshold15.2. European Option PricingTo price options, the code adapts the simulation to the risk-neutral world.Step 1: Recalculate mean returns using the daily risk-free rate16.Step 2: Simulate price paths (portfolio_sims_rn)17.Step 3: Calculate the payoff at expiration: $\max(0, S_T - K)$18.Step 4: Discount the average payoff to present value: $e^{-rT}$19.ResultsBased on a simulation of 80,000 runs over a 200-day timeframe20:Estimated European Call Option Price: ~$9,747.7521.Factors Influencing Price:Volatility: Higher volatility increases the option price due to higher potential upside22.Risk-Free Rate: Higher rates generally increase call option prices23.Time to Expiration: Longer timeframes allow for larger price movements, increasing value24.ExtensionsWhile this code implements European options, the Monte Carlo method is highly extensible to complex derivatives25:American Options: Can be priced using the Least Squares Monte Carlo (LSM) method to account for early exercise26.Exotic Options: Ideal for pricing Asian Options (based on average price) or Barrier Options (based on price thresholds) where analytical formulas are unavailable27272727.
+# 🎲 Monte Carlo Simulation: Portfolio Risk & Option Pricing
+
+![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
+![Finance](https://img.shields.io/badge/Quantitative-Finance-green?style=for-the-badge&logo=cashapp)
+![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Complete-success?style=for-the-badge)
+
+## 📖 Executive Summary
+
+This project implements a sophisticated **Monte Carlo Simulation engine** designed for Quantitative Finance applications. It serves two primary purposes: **Portfolio Risk Assessment** and **Derivatives Valuation**.
+
+By leveraging repeated random sampling, this tool approximates complex mathematical quantities that are difficult or impossible to solve analytically. The project moves from calculating downside risk metrics (VaR/CVaR) using historical correlations to pricing European Call Options using the **Risk-Neutral Valuation framework**.
+
+---
+
+## 🚀 Key Capabilities
+
+### 1. Advanced Data Pipeline
+* **Dynamic Ingestion**: Automatically downloads historical financial data using the `yfinance` API.
+* **Asset Support**: Configured to handle a diverse basket of equities including **AAPL, TSLA, NVDA, MSFT, WMT, and JPM**.
+* **Statistical Analysis**: Computes daily returns, mean returns, and full covariance matrices ($\Sigma$) to understand asset interdependencies.
+
+### 2. Correlated Portfolio Simulation
+* **Cholesky Decomposition**: Uses linear algebra to decompose the covariance matrix ($L$), allowing the generation of **correlated random shocks** ($Z$).
+* **Path Generation**: Simulates **80,000 distinct price paths** over a 200-day horizon to generate a robust probability distribution of future portfolio values.
+
+### 3. Quantitative Risk Metrics
+* **Value at Risk (VaR)**: Calculates the maximum expected loss at a 95% confidence level.
+* **Conditional Value at Risk (CVaR)**: Also known as Expected Shortfall, this measures the average loss in the worst-case scenarios (tail risk).
+
+### 4. Risk-Neutral Option Pricing
+* **Measure Change**: Adapts the simulation from the physical measure (historical drift) to the risk-neutral measure (drift = risk-free rate).
+* **Drift Adjustment**: Replaces historical returns with the daily risk-free rate ($r/252$).
+* **Discounting**: Implements continuous discounting ($e^{-rT}$) to determine the fair present value of European Call Options.
+
+---
+
+## 🛠️ Installation & Dependencies
+
+To replicate this analysis, ensure your environment is set up with the necessary scientific computing libraries.
+
+### Requirements
+The project relies on the standard Python quantitative stack:
+* `numpy`: For vectorization and matrix operations (Cholesky decomposition).
+* `pandas`: For time-series data manipulation.
+* `scipy`: For statistical functions.
+* `matplotlib`: For visualizing price paths and distributions.
+* `yfinance`: For market data extraction.
+
+### Setup Command
+```bash
+pip install numpy scipy matplotlib pandas yfinance
+
+### 📊 Theoretical Framework
+The Monte Carlo Method
+Originating in the 1940s at Los Alamos (Ulam, von Neumann, Metropolis), Monte Carlo simulation uses massive random sampling to estimate results. In this project, we model the evolution of stock prices as a stochastic process.
+
+Mathematical Model: Portfolio Simulation
+We assume the portfolio returns follow a multivariate normal distribution. To maintain the historical correlation between assets (e.g., if NVDA rises, AAPL might also rise), we use Cholesky Decomposition.
